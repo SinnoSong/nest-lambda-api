@@ -34,6 +34,9 @@ resource "aws_s3_object" "nest_app_zip" {
   source = data.archive_file.nestjs_app.output_path
   etag   = filemd5(data.archive_file.nestjs_app.output_path)
 }
+data "aws_caller_identity" "current" {
+
+}
 
 resource "aws_lambda_function" "nest-app" {
   function_name = "nestapp"
@@ -45,7 +48,7 @@ resource "aws_lambda_function" "nest-app" {
   handler          = "main.handler"
   source_code_hash = data.archive_file.nestjs_app.output_base64sha256
 
-  role = "arn:aws:iam::053346009561:role/ts_lambda-role"
+  role = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ts_lambda-role"
 }
 
 resource "aws_cloudwatch_log_group" "hello_py" {
